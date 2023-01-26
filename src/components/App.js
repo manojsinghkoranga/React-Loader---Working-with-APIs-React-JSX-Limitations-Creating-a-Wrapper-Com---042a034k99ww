@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../styles/App.css";
 import Loader from "./Loader";
 
@@ -9,7 +9,7 @@ const LoadingStatus = {
 };
 
 const App = () => {
-  const BASE_URL = "https://content.newtonschool.co/v1/pr/main/users";
+  // const BASE_URL = "https://content.newtonschool.co/v1/pr/main/users";
   const [userId, setUserId] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(LoadingStatus.NOT_STARTED);
   const [userData, setUserData] = React.useState({
@@ -17,10 +17,24 @@ const App = () => {
     email: "",
     name: "",
     phone: "",
-    webiste: "",
+    website: "",
   });
 
-  const handleOnClick = () => {};
+  
+  const fun = async() => {
+    const Response = await fetch(`https://content.newtonschool.co/v1/pr/main/users/${userId}`);
+    const json = await Response.json();
+    setUserData(json);
+  }
+    
+
+  const handleOnClick = () => {
+    setIsLoading(LoadingStatus.IN_PROGRESS);
+    fun();
+    setTimeout(()=> {
+      setIsLoading(LoadingStatus.SUCCESS);
+    }, 2000);
+  };
 
   const onChangeHandler = (event) => {
     setUserId(event.target.value);
@@ -42,12 +56,20 @@ const App = () => {
       </button>
 
       <div id="data">
-        <h1>Click on the button to get the user</h1>
-        <h4 id="id">{userData.id}</h4>
-        <h4 id="email">{userData.email}</h4>
-        <h4 id="name">{userData.name}</h4>
-        <h4 id="phone">{userData.phone}</h4>
-        <h4 id="website">{userData.website}</h4>
+        {userData.id === "" ? 
+          <h1>Click on the button to get the user</h1> : 
+          <>
+          {isLoading === 'IN_PROGRESS' ? <Loader /> :
+            <>
+              <h4 id="id">{userData.id}</h4>
+              <h4 id="email">{userData.email}</h4>
+              <h4 id="name">{userData.name}</h4>
+              <h4 id="phone">{userData.phone}</h4>
+              <h4 id="website">{userData.website}</h4>
+            </>
+          }
+          </>
+        }
       </div>
     </div>
   );
